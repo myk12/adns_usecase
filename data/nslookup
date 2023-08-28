@@ -1,0 +1,17 @@
+#/bin/bash
+
+#!/bin/bash
+
+input_file="alexa-top-10.csv"
+output_file="domain_ipv4_mapping.csv"
+
+echo "Domain,IPv4" > "$output_file"
+
+while IFS=, read -r rank domain; do
+    ipv4_list=$(adnshost -A4 "$domain" | grep "INET" | grep -Eo '([0-9]+\.){3}[0-9]+' | tr '\n' ',' | sed 's/,$//')
+    if [ -n "$ipv4_list" ]; then
+        echo "$domain,$ipv4_list" >> "$output_file"
+    fi
+done < "$input_file"
+
+echo "IPv4 mapping saved to $output_file"
